@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "blog.apps.BlogConfig",
     "users.apps.UsersConfig",
     "crispy_forms",
+    "cloudinary",
 ]
 
 MIDDLEWARE = [
@@ -137,4 +138,12 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get("EMAIL_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASS")
+
+
+CLOUDINARY_ACCESS_KEY_ID = os.environ.get("CLOUDINARY_ACCESS_KEY_ID")
+CLOUDINARY_SECRET_ACCESS_KEY = os.environ.get("CLOUDINARY_SECRET_ACCESS_KEY")
+CLOUD_NAME = os.environ.get("CLOUD_NAME")
+
+CLOUDINARY_FILE_OVERWRITE = False
+CLOUDINARY_DEFAULT_ACL = None
 
