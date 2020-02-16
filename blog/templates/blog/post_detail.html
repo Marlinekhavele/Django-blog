@@ -1,5 +1,8 @@
 {% extends "blog/base.html" %}
+{% load blog_tags %}
+
 {% block content %}
+
 <article class="media content-section">
     <img class="rounded-circle article-img" src="{{ object.author.profile.image.url }}">
     <div class="media-body">
@@ -17,4 +20,34 @@
         <p class="article-content">{{ object.content }}</p>
     </div>
 </article>
+
+<article class="media content-section">
+
+    <!-- comments -->
+    <h3>{{ comments.count }} Comments</h3>
+    {% for comment in comments %}
+    <div class="media-body">
+        <a class="mr-2" href="#">{{ comment.name }}</a>
+        <small class="text-muted">{{ comment.created_on|date:"F d, Y" }}</small>
+    </div>
+    <h2 class="article-title">{{ object.title }}</h2>
+    <p class="article-content">{{ comment.body | linebreaks }}</p>
+    {% endfor %}
+    {% if new_comment %}
+    <h2>Your comment has been added.</h2>
+    {% else %}
+    <form action="." method="post">{% csrf_token%}
+        {{ comment_form.as_p }}
+
+        <p>
+            <input type="submit" value="Add comment">
+        </p>
+    </form>
+    {% endif %}
+
+
+
+
+</article>
+
 {% endblock content %}
