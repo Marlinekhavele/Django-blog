@@ -1,9 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
 from PIL import Image
-import cloudinary
-import cloudinary.uploader
-import cloudinary.api
+
+# import cloudinary
+
+# import cloudinary.uploader
+# import cloudinary.api
 
 # Create your models here.
 class Profile(models.Model):
