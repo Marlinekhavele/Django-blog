@@ -3,6 +3,7 @@
 
 {% block content %}
 
+
 <article class="media content-section">
     <img class="rounded-circle article-img" src="{{ object.author.profile.image.url }}">
     <div class="media-body">
@@ -22,10 +23,10 @@
 </article>
 
 <article class="media content-section">
-
     <!-- comments -->
     <h3>{{ comments.count }} Comments</h3>
     {% for comment in comments %}
+
     <div class="media-body">
         <a class="mr-2" href="#">{{ comment.name }}</a>
         <small class="text-muted">{{ comment.created_on|date:"F d, Y" }}</small>
@@ -39,13 +40,11 @@
     <form action="." method="post">{% csrf_token%}
         {{ comment_form.as_p }}
 
-        <p>
+        <p class='text-muted'>
             <input type="submit" value="Add comment">
         </p>
     </form>
     {% endif %}
-
-
 
 
 </article>

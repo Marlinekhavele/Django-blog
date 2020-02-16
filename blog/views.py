@@ -10,6 +10,8 @@ from django.views.generic import (
     DeleteView,
 )
 from .models import Post
+from .forms import CommentForm
+
 
 
 # Create your views here.
