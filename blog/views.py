@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.mail import send_mail
 
 from django.contrib.auth.models import User
 from django.views.generic import (
@@ -10,7 +11,7 @@ from django.views.generic import (
     DeleteView,
 )
 from .models import Post,Comment
-from .forms import CommentForm
+from .forms import CommentForm,EmailPostForm
 from django.http import HttpResponseRedirect
 
 
@@ -41,6 +42,8 @@ class UserPostListView(ListView):
 
 class PostDetailView(DetailView):
     model = Post
+    template_name = "blog/post_detail.html"  
+
 
     def post_detail(request, id, slug):
         post = get_object_or_404(Post, id=id,slug=slug)
@@ -48,7 +51,7 @@ class PostDetailView(DetailView):
         new_comment = None
         # Comment posted
         if request.method == 'POST':
-            comment_form = CommentForm(request.POST or None)
+            comment_form = CommentForm(data=request.POST)
             if comment_form.is_valid():
                 body = request.POST.get('body')
                 comment = Comment.objects.create(post=post, user=request.user,content=content)
@@ -57,10 +60,11 @@ class PostDetailView(DetailView):
               
         else:
             comment_form = CommentForm()
-
+            
         return render(request,template_name, {'post': post,
                                                'comments': comments,
-                                               'comment_form': comment_form})
+                                               'comment_form': comment_form
+                                               })
 
 
 

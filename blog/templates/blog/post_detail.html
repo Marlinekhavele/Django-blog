@@ -1,82 +1,56 @@
 {% extends "blog/base.html" %}
 {% load blog_tags %}
 
+{% block title %}{{ post.title }}{% endblock %}
+
 {% block content %}
-
-
 <article class="media content-section">
     <img class="rounded-circle article-img" src="{{ object.author.profile.image.url }}">
     <div class="media-body">
-        <div class="article-metadata">
-            <a class="mr-2" href="{% url 'user-posts' post.author.username %}">{{ object.author }}</a>
-            <small class="text-muted">{{ object.date_posted|date:"F d, Y" }}</small>
-            {% if object.author == user %}
-            <div>
-                <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'post-update' object.id %}">Update</a>
-                <a class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'post-delete' object.id %}">Delete</a>
-            </div>
-            {% endif %}
-        </div>
+        <div class="article-metadata"> <a class="mr-2"
+                href="{% url 'user-posts' post.author.username %}">{{ object.author }}</a> <small
+                class="text-muted">{{ object.date_posted|date:"F d, Y" }}</small> {% if object.author == user %} <div>
+                <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'post-update' object.id %}">Update</a> <a
+                    class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'post-delete' object.id %}">Delete</a> </div>
+            {% endif %} </div>
         <h2 class="article-title">{{ object.title }}</h2>
         <p class="article-content">{{ object.content }}</p>
+        </p>
     </div>
 </article>
-
-<hr>
-
-<form method="post">
-    {% csrf_token %}
-    {{comment_form.as_p}}
-    {% if request.user.is_authenticated%}
-    <input type="submit" value="submit" class="btn btn-outline-success">
-    {% else %}
-    <input type="submit" value="submit" class="btn btn-outline-success" disabled>
-    {% endif %}
-
-
-</form>
+<p>
+    <a href="{% url 'post_share' post.id %}">
+        Share this post
+    </a>
+</p>
 
 
 
-
-
-<div class="main-comment-section">
-    {{ comments.count }} Comment {{comments|pluralize}}
-    {% for comment in comments %}
-    <blockquote class="blockquote">
-        <p class="mb-0">{{comment.content}}</p>
-        <footer class="blockquote-footer">by <cite title="Source Title">{{comment.user|capfirst}}</cite>
-        </footer>
-
-    </blockquote>
-    {% endfor %}
+{% with comments.count as total_comments %}
+<h2>
+    {{ total_comments }} comment{{ total_comments|pluralize }}
+</h2>
+{% endwith %}
+{% for comment in comments %}
+<div class="comment">
+    <p class="info">
+        Comment {{ forloop.counter }} by {{ comment.name }}
+        {{ comment.created }}
+    </p>
+    {{ comment.body|linebreaks }}
 </div>
+{% empty %}
+<p>There are no comments yet.</p>
+{% endfor %}
 
-<!-- <article class="media content-section">
-    <h3>{{ comments.count }} Comments</h3>
-    {% for comment in comments %}
+{% if new_comment %}
+<h2>Your comment has been added.</h2>
+{% else %}
+<h2>Add a new comment</h2>
+<form action="." method="POST">{% csrf_token %}
+    {{ comment_form.as_p }}
 
-    <div class="media-body">
-        <a class="mr-2" href="#">{{ comment.name }}</a>
-        <small class="text-muted">{{ comment.created_on|date:"F d, Y" }}</small>
-    </div>
-    <h2 class="article-title">{{ object.title }}</h2>
-    <p class="article-content">{{ comment.body | linebreaks }}</p>
-    {% endfor %}
-    {% if new_comment %}
-    <h2>Your comment has been added.</h2>
-    {% else %}
-    <form method="POST">
-        {% csrf_token%}
-        {{ comment_form.as_p }}
-
-        <p class='text-muted'>
-            <input type="submit" value="Add comment">
-        </p>
-    </form>
-    {% endif %}
-
-
-</article> -->
-
-{% endblock content %}
+    <p><input type="submit" value="Add comment" class="btn btn-outline-success"></p>
+</form>
+{% endif %}
+{% endblock %}
