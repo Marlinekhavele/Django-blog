@@ -27,10 +27,13 @@
             </a>
         </p>
     </div>
+
 </article>
+
 <hr>
 <h4>Leave A Comment</h4>
 <p>Total Number of Comments {{post.comments.count}}</p>
+<a href="{% url 'add_comment' post.id%}" class="btn btn-success btn-sm mt-1 mb-1">Leave A Comment</a>
 {% for comment in post.comments.all %}
 <p>{{comment.created}}</p>
 <p>{{comment.user}}</p>
@@ -38,36 +41,4 @@
 {% empty %}
 <p> There is no comments</p>
 {% endfor%}
-
-
-<!-- 
-{% with comments.count as total_comments %}
-<h2>
-    {{ total_comments }} comment{{ total_comments|pluralize }}
-</h2>
-{% endwith %}
-{% for comment in comments %}
-<div class="comment">
-    <p class="info">
-        Comment {{ forloop.counter }} by {{ comment.name }}
-        {{ comment.created }}
-    </p>
-    {{ comment.body|linebreaks }}
-</div>
-{% empty %}
-<p>There are no comments yet.</p>
-{% endfor %}
-
-{% if new_comment %}
-<h2>Your comment has been added.</h2>
-{% else %}
-<h2>Add a new comment</h2>
-<form method="POST">{% csrf_token %}
-    {{ comment_form.as_p }}
-
-    <p>
-        <input type="submit" value="Add comment" class="btn btn-outline-success">
-    </p>
-</form>
-{% endif %} -->
 {% endblock %}

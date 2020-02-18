@@ -13,6 +13,7 @@ from django.views.generic import (
 from .models import Post,Comment
 from .forms import CommentForm,EmailPostForm
 from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 
 
 
@@ -42,32 +43,7 @@ class UserPostListView(ListView):
 
 class PostDetailView(DetailView):
     model = Post
-    template_name = "blog/post_detail.html"  
-
-
-    def post_detail(request, id, slug):
-        post = get_object_or_404(Post, id=id,slug=slug)
-        comments = Comment.objects.filter(post=post).order_by('-id')
-        new_comment = None
-        # Comment posted
-        if request.method == 'POST':
-            comment_form = CommentForm(data=request.POST)
-            if comment_form.is_valid():
-                body = request.POST.get('body')
-                comment = Comment.objects.create(post=post, user=request.user,content=content)
-                comment.save()
-                return HttpResponseRedirect(post.get_absolute_url())
-              
-        else:
-            comment_form = CommentForm()
-            
-        return render(request,template_name, {'post': post,
-                                               'comments': comments,
-                                               'comment_form': comment_form
-                                               })
-
-
-
+   
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     fields = ["title", "content"]
@@ -82,8 +58,8 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     fields = ["title", "content"]
 
     def form_valid(self, form):
-        form.instance.author = self.request.user
-        return super().form_valid(form)
+       PostDetailViewPostDetailVieworm.instance.author = self.request.user
+       return super().form_valid(form)
 
     def test_func(self):
         post = self.get_object()
@@ -157,4 +133,19 @@ def post_search(request):
         {"form": form, "query": query, "results": results},
     )
 
+def add_comment(request,post_id):
+    post = get_object_or_404(Post,id=post_id)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            body = request.POST.get('body')
+            comment = form.save(commit=False)
+            comment = Comment.objects.create(post=post, user=request.user,body=body)
+            comment.save()
+            return redirect(post.get_absolute_url())
 
+    else:
+        form = CommentForm
+    template = 'blog/post/add_comment.html'
+    context = {'form':form}
+    return render(request,template,context)
