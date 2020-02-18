@@ -9,8 +9,9 @@ from django.views.generic import (
     UpdateView,
     DeleteView,
 )
-from .models import Post
+from .models import Post,Comment
 from .forms import CommentForm
+from django.http import HttpResponseRedirect
 
 
 
@@ -22,7 +23,7 @@ def home(request):
 
 class PostListView(ListView):
     model = Post
-    template_name = "blog/home.html"  # <app>/<model>_<viewtype>.html
+    template_name = "blog/home.html"  
     context_object_name = "posts"
     ordering = ["-date_posted"]
     paginate_by = 5
@@ -30,7 +31,7 @@ class PostListView(ListView):
 
 class UserPostListView(ListView):
     model = Post
-    template_name = "blog/user_posts.html"  # <app>/<model>_<viewtype>.html
+    template_name = "blog/user_posts.html"  
     context_object_name = "posts"
     paginate_by = 5
 
@@ -41,27 +42,26 @@ class UserPostListView(ListView):
 class PostDetailView(DetailView):
     model = Post
 
-    def post_detail(request, slug):
-        post = get_object_or_404(Post, slug=slug)
-        comments = post.comments.filter(active=True)
+    def post_detail(request, id, slug):
+        post = get_object_or_404(Post, id=id,slug=slug)
+        comments = Comment.objects.filter(post=post).order_by('-id')
         new_comment = None
         # Comment posted
         if request.method == 'POST':
-            comment_form = CommentForm(data=request.POST)
+            comment_form = CommentForm(request.POST or None)
             if comment_form.is_valid():
-                # Create Comment object but don't save to database yet
-                new_comment = comment_form.save(commit=False)
-                # Assign the current post to the comment
-                new_comment.post = post
-                # Save the comment to the database
-                new_comment.save()
+                body = request.POST.get('body')
+                comment = Comment.objects.create(post=post, user=request.user,content=content)
+                comment.save()
+                return HttpResponseRedirect(post.get_absolute_url())
+              
         else:
             comment_form = CommentForm()
 
-        return render(request, template_name, {'post': post,
+        return render(request,template_name, {'post': post,
                                                'comments': comments,
-                                               'new_comment': new_comment,
                                                'comment_form': comment_form})
+
 
 
 class PostCreateView(LoginRequiredMixin, CreateView):
@@ -105,34 +105,31 @@ def about(request):
 
 
 
-
+ 
 def post_share(request, post_id):
     # Retrieve post by id
-    post = get_object_or_404(Post, id=post_id, status="published")
-    sent = False
-
-    if request.method == "POST":
+    post = get_object_or_404(Post, id=post_id, status='published')
+    sent = False 
+ 
+    if request.method == 'POST':
         # Form was submitted
         form = EmailPostForm(request.POST)
         if form.is_valid():
             # Form fields passed validation
             cd = form.cleaned_data
-            post_url = request.build_absolute_uri(post.get_absolute_url())
-            subject = '{} ({}) recommends you reading "{}"'.format(
-                cd["name"], cd["email"], post.title
-            )
-            message = 'Read "{}" at {}\n\n{}\'s comments: {}'.format(
-                post.title, post_url, cd["name"], cd["comments"]
-            )
-            send_mail(subject, message, "admin@myblog.com", [cd["to"]])
+            post_url = request.build_absolute_uri(
+                                          post.get_absolute_url())
+            subject = '{} ({}) recommends you reading "{}"'.format(cd['name'], cd['email'], post.title)
+            message = 'Read "{}" at {}\n\n{}\'s comments: {}'.format(post.title, post_url, cd['name'], cd['comments'])
+            send_mail(subject, message, 'admin@myblog.com',
+ [cd['to']])
             sent = True
     else:
         form = EmailPostForm()
-    return render(
-        request,
-        "blog/post/share.html",
-        {"post": post, "form": form, "sent": sent},
-    )
+    return render(request, 'blog/post/share.html', {'post': post,
+                                                    'form': form,
+                                                    'sent': sent})
+
 
 
 def post_search(request):
@@ -155,3 +152,5 @@ def post_search(request):
         "blog/post/search.html",
         {"form": form, "query": query, "results": results},
     )
+
+

@@ -22,8 +22,37 @@
     </div>
 </article>
 
-<article class="media content-section">
-    <!-- comments -->
+<hr>
+
+<form method="post">
+    {% csrf_token %}
+    {{comment_form.as_p}}
+    {% if request.user.is_authenticated%}
+    <input type="submit" value="submit" class="btn btn-outline-success">
+    {% else %}
+    <input type="submit" value="submit" class="btn btn-outline-success" disabled>
+    {% endif %}
+
+
+</form>
+
+
+
+
+
+<div class="main-comment-section">
+    {{ comments.count }} Comment {{comments|pluralize}}
+    {% for comment in comments %}
+    <blockquote class="blockquote">
+        <p class="mb-0">{{comment.content}}</p>
+        <footer class="blockquote-footer">by <cite title="Source Title">{{comment.user|capfirst}}</cite>
+        </footer>
+
+    </blockquote>
+    {% endfor %}
+</div>
+
+<!-- <article class="media content-section">
     <h3>{{ comments.count }} Comments</h3>
     {% for comment in comments %}
 
@@ -37,7 +66,8 @@
     {% if new_comment %}
     <h2>Your comment has been added.</h2>
     {% else %}
-    <form action="." method="post">{% csrf_token%}
+    <form method="POST">
+        {% csrf_token%}
         {{ comment_form.as_p }}
 
         <p class='text-muted'>
@@ -47,6 +77,6 @@
     {% endif %}
 
 
-</article>
+</article> -->
 
 {% endblock content %}
