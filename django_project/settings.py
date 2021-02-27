@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "crispy_forms",
     # "cloudinary",
     "taggit",
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
