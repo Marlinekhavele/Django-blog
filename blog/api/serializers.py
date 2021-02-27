@@ -6,7 +6,7 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = ['title','body','content','updated']
 
-class Comment(serializers.ModelSerializer):
+class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ['name','email','body','updated']
