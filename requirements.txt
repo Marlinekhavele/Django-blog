@@ -29,7 +29,6 @@ Pillow==6.2.2
 pipenv==2018.11.26
 pluggy==0.13.1
 post==2019.4.13
-public==2019.4.13
 py==1.8.1
 pycodestyle==2.5.0
 pycrypto==2.6.1
